@@ -49,6 +49,3 @@ class DBTreeView(QWidget):
 
         for child in parent_node.get_children():
             self.fill_nodes(child, child_tree_item)
-
-
-

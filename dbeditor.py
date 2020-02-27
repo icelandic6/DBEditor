@@ -10,8 +10,8 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
-    mainWindow = DBEditorWindow()
-    mainWindow.show()
+    main_window = DBEditorWindow()
+    main_window.show()
 
     result = app.exec_()
 
