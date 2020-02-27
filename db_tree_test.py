@@ -1,4 +1,4 @@
-import dbnode
+from db_node import DBNode
 
 
 class DBTreeTest:
@@ -8,11 +8,24 @@ class DBTreeTest:
     def get_root_node(self):
         return self.root
 
-    # def get_node_children(self, node):
-    #     return node.children
+    def find_node(self, value):
+        return self.__find_node__(self.root, value)
+
+    def __find_node__(self, node, value):
+        result = None
+
+        if node.value == value:
+            result = node
+        else:
+            for child_node in node.get_children():
+                result = self.__find_node__(child_node, value)
+                if result is not None:
+                    break
+
+        return result
 
     def create_test_tree(self):
-        self.root = dbnode.DBNode('Node0')
+        self.root = DBNode('Node0')
 
         node1 = self.root.add_child('Node1')
         node11 = node1.add_child('Node11')

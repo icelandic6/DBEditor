@@ -2,8 +2,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 
-from dbtree_view import DBTreeView
-from cached_tree_view import CachedTreeView
+from cached_tree_controller import CachedTreeController
+from db_tree_controller import DBTreeController
 
 
 class DBEditorWindow(QMainWindow):
@@ -18,16 +18,15 @@ class DBEditorWindow(QMainWindow):
 
         self.central_widget = QWidget(self)
         plt = self.central_widget.palette()
-        plt.setColor(self.central_widget.backgroundRole(), QColor(100, 200, 100, 100))
+        plt.setColor(self.central_widget.backgroundRole(), QColor(100, 150, 200, 100))
         self.central_widget.setPalette(plt)
         self.central_widget.setAutoFillBackground(True)
 
-        self.db_tree_view = DBTreeView()
-        self.db_tree_view.reset_tree()
-        self.db_tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.db_tree_controller = DBTreeController()
+        self.db_tree_controller.reset_tree()
 
-        self.cached_tree_view = CachedTreeView()
-        self.cached_tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.cached_tree_controller = CachedTreeController()
+        self.cached_tree_controller.reset_tree()
 
         self.load_node_button = QPushButton(self)
         self.load_node_button.setText('<<<')
@@ -73,7 +72,7 @@ class DBEditorWindow(QMainWindow):
         self.left_layout = QVBoxLayout()
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_layout.setSpacing(6)
-        self.left_layout.addWidget(self.cached_tree_view)
+        self.left_layout.addWidget(self.cached_tree_controller.tree_view())
         self.left_layout.addLayout(self.bottom_buttons_layout)
 
         self.main_layout = QHBoxLayout()
@@ -81,7 +80,13 @@ class DBEditorWindow(QMainWindow):
         self.main_layout.setSpacing(10)
         self.main_layout.addLayout(self.left_layout)
         self.main_layout.addLayout(self.mid_layout)
-        self.main_layout.addWidget(self.db_tree_view)
+        self.main_layout.addWidget(self.db_tree_controller.tree_view())
 
         self.central_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.central_widget)
+
+        self.load_node_button.clicked.connect(self.load_node_to_cache_tree)
+        self.reset_button.clicked.connect(self.db_tree_controller.reset_tree)
+
+    def load_node_to_cache_tree(self):
+        self.db_tree_controller.selected_node()
