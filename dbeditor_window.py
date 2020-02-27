@@ -23,6 +23,7 @@ class DBEditorWindow(QMainWindow):
         self.centralWidget.setAutoFillBackground(True)
 
         self.dbTreeView = DBTreeView()
+        self.dbTreeView.reset_tree()
         self.dbTreeView.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.cachedTreeView = CachedTreeView()

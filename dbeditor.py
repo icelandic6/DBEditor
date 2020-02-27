@@ -13,10 +13,6 @@ if __name__ == '__main__':
     mainWindow = DBEditorWindow()
     mainWindow.show()
 
-    test_tree = dbtree_test.DBTreeTest()
-    test_tree.create_test_tree()
-    test_tree.print_tree()
-
     result = app.exec_()
 
     sys.exit(result)

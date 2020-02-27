@@ -2,7 +2,7 @@ from PyQt5.QtCore import QObject
 
 
 class DBNode:
-    def __init__(self, value='', parent=None):
+    def __init__(self, value=''):
         # super(QObject, self).__init__(parent)
 
         self.children = []
@@ -12,3 +12,9 @@ class DBNode:
         node = DBNode(value)
         self.children.append(node)
         return node
+
+    def value(self):
+        return self.value
+
+    def get_children(self):
+        return self.children

@@ -1,9 +1,15 @@
 import dbnode
 
 
-class DBTreeTest():
+class DBTreeTest:
     def __init__(self):
         self.root = None
+
+    def get_root_node(self):
+        return self.root
+
+    # def get_node_children(self, node):
+    #     return node.children
 
     def create_test_tree(self):
         self.root = dbnode.DBNode('Node0')
