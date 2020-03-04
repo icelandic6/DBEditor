@@ -26,7 +26,7 @@ class DBEditorWindow(QMainWindow):
         self.db_tree_controller.reset()
 
         self.cached_tree_controller = CachedTreeController()
-        self.cached_tree_controller.reset_tree()
+        self.cached_tree_controller.reset()
 
         self.load_to_cache_button = QPushButton(self)
         self.load_to_cache_button.setText('<<<')
@@ -96,3 +96,4 @@ class DBEditorWindow(QMainWindow):
 
     def reset_button_clicked(self):
         self.db_tree_controller.reset()
+        self.cached_tree_controller.reset()
