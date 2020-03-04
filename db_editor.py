@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWidgets import *
-import db_tree_test
+import test_data_base
 
 from db_editor_window import DBEditorWindow
 

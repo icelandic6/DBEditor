@@ -8,7 +8,7 @@ from db_tree_controller import DBTreeController
 
 class DBEditorWindow(QMainWindow):
     def __init__(self, parent=None):
-        super(QMainWindow, self).__init__(parent)
+        super(DBEditorWindow, self).__init__(parent)
 
         self.setWindowTitle('DBEditor')
 
@@ -23,14 +23,14 @@ class DBEditorWindow(QMainWindow):
         self.central_widget.setAutoFillBackground(True)
 
         self.db_tree_controller = DBTreeController()
-        self.db_tree_controller.reset_tree()
+        self.db_tree_controller.reset()
 
         self.cached_tree_controller = CachedTreeController()
         self.cached_tree_controller.reset_tree()
 
-        self.load_node_button = QPushButton(self)
-        self.load_node_button.setText('<<<')
-        self.load_node_button.setFixedSize(60, 26)
+        self.load_to_cache_button = QPushButton(self)
+        self.load_to_cache_button.setText('<<<')
+        self.load_to_cache_button.setFixedSize(60, 26)
 
         self.add_node_button = QPushButton(self)
         self.add_node_button.setText('+')
@@ -57,7 +57,7 @@ class DBEditorWindow(QMainWindow):
         self.mid_layout = QVBoxLayout()
         self.mid_layout.setContentsMargins(0, 50, 0, 0)
         self.mid_layout.setSpacing(0)
-        self.mid_layout.addWidget(self.load_node_button, 0, Qt.AlignHCenter | Qt.AlignTop)
+        self.mid_layout.addWidget(self.load_to_cache_button, 0, Qt.AlignHCenter | Qt.AlignTop)
 
         self.bottom_buttons_layout = QHBoxLayout()
         self.bottom_buttons_layout.setContentsMargins(0, 0, 0, 0)
@@ -85,8 +85,14 @@ class DBEditorWindow(QMainWindow):
         self.central_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.central_widget)
 
-        self.load_node_button.clicked.connect(self.load_node_to_cache_tree)
-        self.reset_button.clicked.connect(self.db_tree_controller.reset_tree)
+        self.load_to_cache_button.clicked.connect(self.load_to_cache_button_clicked)
+        self.reset_button.clicked.connect(self.reset_button_clicked)
 
-    def load_node_to_cache_tree(self):
-        self.db_tree_controller.selected_node()
+    def load_to_cache_button_clicked(self):
+        node = self.db_tree_controller.selected_node()
+
+        if node is not None:
+            self.cached_tree_controller.add_node(node)
+
+    def reset_button_clicked(self):
+        self.db_tree_controller.reset()
