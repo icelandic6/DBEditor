@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 
 from cached_tree_controller import CachedTreeController
 from db_tree_controller import DBTreeController
+from data_manager import DataManager
 
 
 class DBEditorWindow(QMainWindow):
@@ -22,27 +23,29 @@ class DBEditorWindow(QMainWindow):
         self.central_widget.setPalette(plt)
         self.central_widget.setAutoFillBackground(True)
 
-        self.db_tree_controller = DBTreeController()
-        self.db_tree_controller.reset()
+        db_tree_controller = DBTreeController()
+        db_tree_controller.reset()
 
-        self.cached_tree_controller = CachedTreeController()
-        self.cached_tree_controller.reset()
+        cached_tree_controller = CachedTreeController()
+        cached_tree_controller.reset()
+
+        self.data_manager = DataManager(db_tree_controller, cached_tree_controller)
 
         self.load_to_cache_button = QPushButton(self)
         self.load_to_cache_button.setText('<<<')
         self.load_to_cache_button.setFixedSize(60, 26)
 
-        self.add_node_button = QPushButton(self)
-        self.add_node_button.setText('+')
-        self.add_node_button.setFixedSize(26, 26)
+        self.add_item_button = QPushButton(self)
+        self.add_item_button.setText('+')
+        self.add_item_button.setFixedSize(26, 26)
 
-        self.remove_node_button = QPushButton(self)
-        self.remove_node_button.setText('-')
-        self.remove_node_button.setFixedSize(26, 26)
+        self.remove_item_button = QPushButton(self)
+        self.remove_item_button.setText('-')
+        self.remove_item_button.setFixedSize(26, 26)
 
-        self.edit_node_button = QPushButton(self)
-        self.edit_node_button.setText('a')
-        self.edit_node_button.setFixedSize(26, 26)
+        self.edit_item_button = QPushButton(self)
+        self.edit_item_button.setText('a')
+        self.edit_item_button.setFixedSize(26, 26)
 
         self.apply_button = QPushButton(self)
         self.apply_button.setText('Apply')
@@ -62,9 +65,9 @@ class DBEditorWindow(QMainWindow):
         self.bottom_buttons_layout = QHBoxLayout()
         self.bottom_buttons_layout.setContentsMargins(0, 0, 0, 0)
         self.bottom_buttons_layout.setSpacing(4)
-        self.bottom_buttons_layout.addWidget(self.add_node_button)
-        self.bottom_buttons_layout.addWidget(self.remove_node_button)
-        self.bottom_buttons_layout.addWidget(self.edit_node_button)
+        self.bottom_buttons_layout.addWidget(self.add_item_button)
+        self.bottom_buttons_layout.addWidget(self.remove_item_button)
+        self.bottom_buttons_layout.addWidget(self.edit_item_button)
         self.bottom_buttons_layout.addStretch()
         self.bottom_buttons_layout.addWidget(self.apply_button)
         self.bottom_buttons_layout.addWidget(self.reset_button)
@@ -72,7 +75,7 @@ class DBEditorWindow(QMainWindow):
         self.left_layout = QVBoxLayout()
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_layout.setSpacing(6)
-        self.left_layout.addWidget(self.cached_tree_controller.tree_view())
+        self.left_layout.addWidget(cached_tree_controller.tree_view())
         self.left_layout.addLayout(self.bottom_buttons_layout)
 
         self.main_layout = QHBoxLayout()
@@ -80,20 +83,34 @@ class DBEditorWindow(QMainWindow):
         self.main_layout.setSpacing(10)
         self.main_layout.addLayout(self.left_layout)
         self.main_layout.addLayout(self.mid_layout)
-        self.main_layout.addWidget(self.db_tree_controller.tree_view())
+        self.main_layout.addWidget(db_tree_controller.tree_view())
 
         self.central_widget.setLayout(self.main_layout)
         self.setCentralWidget(self.central_widget)
 
         self.load_to_cache_button.clicked.connect(self.load_to_cache_button_clicked)
-        self.reset_button.clicked.connect(self.reset_button_clicked)
+
+        self.add_item_button.clicked.connect(self.on_add_item_to_cache_button_clicked)
+        self.edit_item_button.clicked.connect(self.on_edit_item_button_clicked)
+        self.remove_item_button.clicked.connect(self.on_remove_item_button)
+
+        self.reset_button.clicked.connect(self.on_reset_button_clicked)
+        self.apply_button.clicked.connect(self.on_apply_button_clicked)
 
     def load_to_cache_button_clicked(self):
-        node = self.db_tree_controller.selected_node()
+        self.data_manager.load_data_to_cache()
 
-        if node is not None:
-            self.cached_tree_controller.add_node(node)
+    def on_reset_button_clicked(self):
+        self.data_manager.reset()
 
-    def reset_button_clicked(self):
-        self.db_tree_controller.reset()
-        self.cached_tree_controller.reset()
+    def on_add_item_to_cache_button_clicked(self):
+        self.data_manager.add_new_item_to_cache()
+
+    def on_edit_item_button_clicked(self):
+        pass
+
+    def on_remove_item_button(self):
+        pass
+
+    def on_apply_button_clicked(self):
+        pass

@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import QSizePolicy
 from PyQt5.QtCore import QObject
 
-from db_tree_view import DBTreeView
-from test_data_base import TestDataBase
+from ui.db_tree_view import DBTreeView
+from test_trees.test_data_base import TestDataBase
 
 
 class DBTreeController(QObject):
@@ -21,9 +21,9 @@ class DBTreeController(QObject):
         self.data_base.dict.clear()
         self.data_base.create_test_data_base()
 
-        self.update_tree_view()
+        self.__update_tree_view()
 
-    def update_tree_view(self):
+    def __update_tree_view(self):
         self.__db_tree_view.clear()
 
         for index in self.data_base.dict.keys():
@@ -36,10 +36,25 @@ class DBTreeController(QObject):
                                      node.parent_id,
                                      node.value)
 
-    def selected_node(self):
+    # def selected_node(self):
+    #     selected_id = self.__db_tree_view.selected_item_id()
+    #
+    #     if selected_id is None:
+    #         return
+    #
+    #     return self.data_base.get_node_by_index(selected_id)
+
+    def selected_item(self):
         selected_id = self.__db_tree_view.selected_item_id()
 
         if selected_id is None:
             return
 
-        return self.data_base.find_node_by_id(selected_id)
+        for key, value in self.data_base.dict.items():
+            if value.node_id == selected_id:
+                selected_node_index = key
+
+        return selected_node_index, self.data_base.get_node_by_index(selected_node_index)
+
+    def get_node_by_index(self, index):
+        return self.data_base.get_node_by_index(index)
