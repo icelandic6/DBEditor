@@ -33,7 +33,6 @@ class CachedTreeView(QWidget):
 
         self.tree_view = QTreeView(self)
         self.tree_view.setHeaderHidden(True)
-        # self.tree_view.setModel(self.tree_model)
 
         self.root_item = None
 

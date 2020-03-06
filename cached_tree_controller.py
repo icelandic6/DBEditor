@@ -14,8 +14,6 @@ class CachedTreeController(QObject):
         self.__cached_tree_view = CachedTreeView()
         self.__cached_tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        self.__cache_items_index = 0
-
         self.__cached_tree_view.item_changed.connect(self.on_item_changed)
 
     def tree_view(self):
@@ -25,40 +23,23 @@ class CachedTreeController(QObject):
         self.cached_data_base.dict.clear()
         self.__cached_tree_view.clear()
 
-        self.__cache_items_index = 0
-
-    def has_item_with_id(self, node_id):
-        for index in self.cached_data_base.dict.keys():
-            if self.cached_data_base.dict[index].node_id == node_id:
-                return True
-
-        return False
-
-    def add_item(self, item):
-        if item.node_id is not None and self.has_item_with_id(item.node_id):
-            return None
-
-        new_item_index = self.__cache_items_index
-        self.cached_data_base.dict[new_item_index] = item
-
-        self.__cache_items_index += 1
+    def add_item(self, item_id, item):
+        self.cached_data_base.dict[item_id] = item
 
         self.__update_tree_view()
-        return new_item_index
 
     def __update_tree_view(self):
         self.__cached_tree_view.clear()
 
-        # for index in self.cached_data_base.dict.keys():
-        for index, v in sorted(self.cached_data_base.dict.items(), key=lambda item: item[1].parent_id):
-            self.__add_tree_item(self.cached_data_base.dict[index])
+        for item_id, v in sorted(self.cached_data_base.dict.items(), key=lambda item: item[1].parent_id, reverse=True):
+            self.__add_tree_item(item_id, v)
 
         self.__cached_tree_view.expand_all()
 
-    def __add_tree_item(self, node):
-        self.__cached_tree_view.add_item(node.node_id,
-                                         node.parent_id,
-                                         node.value)
+    def __add_tree_item(self, item_id, item):
+        self.__cached_tree_view.add_item(item_id,
+                                         item.parent_id,
+                                         item.value)
 
     def on_item_changed(self, item_id, value):
         for v in self.cached_data_base.dict.values():

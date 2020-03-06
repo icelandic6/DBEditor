@@ -26,13 +26,13 @@ class DBTreeController(QObject):
     def __update_tree_view(self):
         self.__db_tree_view.clear()
 
-        for index in self.data_base.dict.keys():
-            self.__add_tree_item(self.data_base.dict[index])
+        for node_id, node in self.data_base.dict.items():
+            self.__add_tree_item(node_id, node)
 
         self.__db_tree_view.expand_all()
 
-    def __add_tree_item(self, node):
-        self.__db_tree_view.add_item(node.node_id,
+    def __add_tree_item(self, node_id, node):
+        self.__db_tree_view.add_item(node_id,
                                      node.parent_id,
                                      node.value)
 
@@ -42,12 +42,7 @@ class DBTreeController(QObject):
         if selected_id is None:
             return None, None
 
-        for key, value in self.data_base.dict.items():
-            if value.node_id == selected_id:
-                selected_node_index = key
-                break
-
-        return selected_node_index, self.data_base.get_node_by_index(selected_node_index)
+        return selected_id, self.data_base.get_node_by_index(selected_id)
 
     def get_node_by_index(self, index):
         return self.data_base.get_node_by_index(index)
