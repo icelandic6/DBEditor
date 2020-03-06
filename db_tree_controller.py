@@ -36,23 +36,16 @@ class DBTreeController(QObject):
                                      node.parent_id,
                                      node.value)
 
-    # def selected_node(self):
-    #     selected_id = self.__db_tree_view.selected_item_id()
-    #
-    #     if selected_id is None:
-    #         return
-    #
-    #     return self.data_base.get_node_by_index(selected_id)
-
     def selected_item(self):
         selected_id = self.__db_tree_view.selected_item_id()
 
         if selected_id is None:
-            return
+            return None, None
 
         for key, value in self.data_base.dict.items():
             if value.node_id == selected_id:
                 selected_node_index = key
+                break
 
         return selected_node_index, self.data_base.get_node_by_index(selected_node_index)
 

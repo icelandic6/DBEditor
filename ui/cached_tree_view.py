@@ -1,11 +1,30 @@
 from PyQt5.QtWidgets import QWidget, QTreeView, QHBoxLayout
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSortFilterProxyModel, pyqtSignal
 
 import ui.tree_view_item_roles as roles
 
 
+class DBProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(DBProxyModel, self).__init__(parent)
+
+    def lessThan(self, left_index, right_index):
+        left_pid = left_index.data(roles.ParentIdRole)
+        right_pid = right_index.data(roles.ParentIdRole)
+
+        if left_pid == right_pid:
+            left_id = left_index.data(roles.ItemIdRole)
+            right_id = right_index.data(roles.ItemIdRole)
+
+            return left_id > right_id
+
+        return left_pid > right_pid
+
+
 class CachedTreeView(QWidget):
+    item_changed = pyqtSignal(int, str)
+
     def __init__(self, parent=None):
         super(CachedTreeView, self).__init__(parent)
 
@@ -14,7 +33,7 @@ class CachedTreeView(QWidget):
 
         self.tree_view = QTreeView(self)
         self.tree_view.setHeaderHidden(True)
-        self.tree_view.setModel(self.tree_model)
+        # self.tree_view.setModel(self.tree_model)
 
         self.root_item = None
 
@@ -24,6 +43,13 @@ class CachedTreeView(QWidget):
         main_layout.addWidget(self.tree_view)
 
         self.setLayout(main_layout)
+
+        self.proxy_model = DBProxyModel(self)
+        self.proxy_model.setSourceModel(self.tree_model)
+        self.tree_view.setModel(self.proxy_model)
+        self.tree_view.setSortingEnabled(True)
+
+        self.tree_model.dataChanged.connect(self.on_data_changed)
 
     def add_item(self, node_id, parent_id, value):
         item = QStandardItem()
@@ -62,9 +88,6 @@ class CachedTreeView(QWidget):
             else:
                 self.root_item.appendRow(item)
 
-    def change_item_parent(self, node_id, parent_id):
-        item = self.find_item(self, node_id)
-
     def find_item(self, item_id):
         items_list = self.tree_model.match(self.tree_model.index(0, 0), roles.ItemIdRole, item_id,
                                            1, Qt.MatchExactly | Qt.MatchRecursive)
@@ -74,6 +97,31 @@ class CachedTreeView(QWidget):
             return self.tree_model.itemFromIndex(index)
 
         return None
+
+    def on_data_changed(self, first_index):
+        item = self.tree_model.itemFromIndex(first_index)
+
+        item_id = item.data(roles.ItemIdRole)
+        item_value = item.data(Qt.DisplayRole)
+
+        self.item_changed.emit(item_id, item_value)
+
+    def selected_item_id(self):
+        indexes = self.tree_view.selectedIndexes()
+
+        if not indexes:
+            return None
+
+        # item = self.tree_model.itemFromIndex()
+        return indexes.pop().data(roles.ItemIdRole)
+
+    def enter_item_edit_mode(self, item_id):
+        items_list = self.tree_model.match(self.tree_model.index(0, 0), roles.ItemIdRole, item_id,
+                                           1, Qt.MatchExactly | Qt.MatchRecursive)
+
+        if items_list:
+            index = items_list.pop()
+            self.tree_view.edit(index)
 
     def clear(self):
         self.tree_model.clear()

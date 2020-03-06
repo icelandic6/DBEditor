@@ -1,8 +1,25 @@
 from PyQt5.QtWidgets import QWidget, QTreeView, QHBoxLayout
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSortFilterProxyModel
 
 import ui.tree_view_item_roles as roles
+
+
+class DBProxyModel(QSortFilterProxyModel):
+    def __init__(self, parent=None):
+        super(DBProxyModel, self).__init__(parent)
+
+    def lessThan(self, left_index, right_index):
+        left_pid = left_index.data(roles.ParentIdRole)
+        right_pid = right_index.data(roles.ParentIdRole)
+
+        if left_pid == right_pid:
+            left_id = left_index.data(roles.ItemIdRole)
+            right_id = right_index.data(roles.ItemIdRole)
+
+            return left_id > right_id
+
+        return left_pid > right_pid
 
 
 class DBTreeView(QWidget):
@@ -14,7 +31,7 @@ class DBTreeView(QWidget):
 
         self.tree_view = QTreeView(self)
         self.tree_view.setHeaderHidden(True)
-        self.tree_view.setModel(self.tree_model)
+        # self.tree_view.setModel(self.tree_model)
 
         self.root_item = None
 
@@ -24,6 +41,11 @@ class DBTreeView(QWidget):
         main_layout.addWidget(self.tree_view)
 
         self.setLayout(main_layout)
+
+        self.proxy_model = DBProxyModel(self)
+        self.proxy_model.setSourceModel(self.tree_model)
+        self.tree_view.setModel(self.proxy_model)
+        self.tree_view.setSortingEnabled(True)
 
     def add_item(self, node_id, parent_id, value):
         item = QStandardItem()
@@ -63,6 +85,8 @@ class DBTreeView(QWidget):
 
             self.root_item.appendRow(item)
 
+        # self.proxy_model.invalidate()
+
     def find_item(self, item_id):
         items_list = self.tree_model.match(self.tree_model.index(0, 0), roles.ItemIdRole, item_id,
                                            1, Qt.MatchExactly | Qt.MatchRecursive)
@@ -79,8 +103,8 @@ class DBTreeView(QWidget):
         if not indexes:
             return None
 
-        item = self.tree_model.itemFromIndex(indexes.pop())
-        return item.data(roles.ItemIdRole)
+        # item = self.tree_model.itemFromIndex(index)
+        return indexes.pop().data(roles.ItemIdRole)
 
     def clear(self):
         self.tree_model.clear()
