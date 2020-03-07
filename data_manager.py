@@ -1,5 +1,3 @@
-from cached_tree_controller import CachedTreeController
-from db_tree_controller import DBTreeController
 from db_node import DBNode
 
 
@@ -16,6 +14,8 @@ class DataManager:
     def reset(self):
         self.db_controller.reset()
         self.cache_controller.reset()
+        self.cached_ids.clear()
+        self.pre_cached_ids.clear()
         self.__cache_items_index = 1
 
     def load_data_to_cache(self):
@@ -65,8 +65,29 @@ class DataManager:
         if selected_index is None or selected_item is None:
             return
 
-        new_item = DBNode(selected_item.node_id)
+        new_item = DBNode(selected_index)
 
-        new_item_index = self.cache_controller.add_item(new_item)
-        self.cache_controller.enter_item_edit_mode(new_item_index)
-        print('Added new item to cache')
+        new_id = self.__cache_items_index
+        self.__cache_items_index += 1
+
+        self.cache_controller.add_item(new_id, new_item)
+        self.cache_controller.enter_item_edit_mode(new_id)
+
+    def remove_cache_item(self):
+        selected_index, selected_item = self.cache_controller.selected_item()
+
+        if selected_index is None or selected_item is None:
+            return
+
+        print('Cache item (', selected_index, selected_item.parent_id, selected_item.value, 'removed')
+
+    def edit_cache_item(self):
+        selected_index, selected_item = self.cache_controller.selected_item()
+
+        if selected_index is None or selected_item is None:
+            return
+
+        self.cache_controller.enter_item_edit_mode(selected_index)
+
+    def apply_changes(self):
+        pass

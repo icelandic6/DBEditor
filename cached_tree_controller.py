@@ -31,7 +31,7 @@ class CachedTreeController(QObject):
     def __update_tree_view(self):
         self.__cached_tree_view.clear()
 
-        for item_id, v in sorted(self.cached_data_base.dict.items(), key=lambda item: item[1].parent_id, reverse=True):
+        for item_id, v in self.sorted_data().items():
             self.__add_tree_item(item_id, v)
 
         self.__cached_tree_view.expand_all()
@@ -41,11 +41,24 @@ class CachedTreeController(QObject):
                                          item.parent_id,
                                          item.value)
 
+    def sorted_data(self):
+        new_dict = dict(self.cached_data_base.dict)
+        sorted_dict = {}
+        added_parent_ids = []
+
+        while new_dict:
+            for key, value in new_dict.items():
+                if value.parent_id not in self.cached_data_base.dict.keys() or value.parent_id in added_parent_ids:
+                    sorted_dict[key] = value
+                    new_dict.pop(key)
+                    added_parent_ids.append(key)
+                    break
+
+        return sorted_dict
+
     def on_item_changed(self, item_id, value):
-        for v in self.cached_data_base.dict.values():
-            if v.node_id == item_id:
-                v.value = value
-                break
+        if item_id in self.cached_data_base.dict:
+            self.cached_data_base.dict[item_id].value = value
 
     def selected_item(self):
         selected_id = self.__cached_tree_view.selected_item_id()
@@ -53,9 +66,7 @@ class CachedTreeController(QObject):
         if selected_id is None:
             return None, None
 
-        for key, value in self.cached_data_base.dict.items():
-            if value.node_id == selected_id:
-                selected_node_index = key
+        selected_node_index = selected_id if selected_id in self.cached_data_base.dict else None
 
         return selected_node_index, self.cached_data_base.get_node_by_index(selected_node_index)
 
@@ -65,6 +76,6 @@ class CachedTreeController(QObject):
 
         return new_index
 
-    def enter_item_edit_mode(self, index):
-        if index in self.cached_data_base.dict:
-            self.__cached_tree_view.enter_item_edit_mode(self.cached_data_base.dict[index].node_id)
+    def enter_item_edit_mode(self, item_id):
+        if item_id in self.cached_data_base.dict:
+            self.__cached_tree_view.enter_item_edit_mode(item_id)

@@ -107,10 +107,10 @@ class DBEditorWindow(QMainWindow):
         self.data_manager.add_new_item_to_cache()
 
     def on_edit_item_button_clicked(self):
-        pass
+        self.data_manager.edit_cache_item()
 
     def on_remove_item_button(self):
-        pass
+        self.data_manager.remove_cache_item()
 
     def on_apply_button_clicked(self):
-        pass
+        self.data_manager.apply_changes()
