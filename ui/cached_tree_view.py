@@ -50,11 +50,12 @@ class CachedTreeView(QWidget):
 
         self.tree_model.dataChanged.connect(self.on_data_changed)
 
-    def add_item(self, node_id, parent_id, value):
+    def add_item(self, node_id, parent_id, value, exists):
         item = QStandardItem()
         item.setData(node_id, roles.ItemIdRole)
         item.setData(parent_id, roles.ParentIdRole)
         item.setData(value, Qt.DisplayRole)
+        item.setEnabled(exists)
 
         if parent_id == 0:
             self.root_item = item

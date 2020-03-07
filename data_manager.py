@@ -6,7 +6,7 @@ class DataManager:
         self.db_controller = db_controller
         self.cache_controller = cache_controller
 
-        self.__cache_items_index = 1
+        self.__cache_items_id = 1
 
         self.cached_ids = {}
         self.pre_cached_ids = {}
@@ -16,7 +16,7 @@ class DataManager:
         self.cache_controller.reset()
         self.cached_ids.clear()
         self.pre_cached_ids.clear()
-        self.__cache_items_index = 1
+        self.__cache_items_id = 1
 
     def load_data_to_cache(self):
         selected_id, selected_item = self.db_controller.selected_item()
@@ -33,8 +33,8 @@ class DataManager:
             self.cached_ids[selected_id] = self.pre_cached_ids[selected_id]
             self.pre_cached_ids.pop(selected_id)
         else:
-            new_id = self.__cache_items_index
-            self.__cache_items_index += 1
+            new_id = self.__cache_items_id
+            self.__cache_items_id += 1
 
             self.cached_ids[selected_id] = new_id
 
@@ -46,8 +46,8 @@ class DataManager:
             new_parent_id = self.pre_cached_ids[selected_item.parent_id]
 
         if new_parent_id is None:
-            new_parent_id = self.__cache_items_index
-            self.__cache_items_index += 1
+            new_parent_id = self.__cache_items_id
+            self.__cache_items_id += 1
 
             self.pre_cached_ids[selected_item.parent_id] = new_parent_id
 
@@ -60,26 +60,26 @@ class DataManager:
             self.cache_controller.add_item(new_id, new_item)
 
     def add_new_item_to_cache(self):
-        selected_index, selected_item = self.cache_controller.selected_item()
+        selected_id, selected_item = self.cache_controller.selected_item()
 
-        if selected_index is None or selected_item is None:
+        if selected_id is None or selected_item is None:
             return
 
-        new_item = DBNode(selected_index)
+        new_item = DBNode(selected_id)
 
-        new_id = self.__cache_items_index
-        self.__cache_items_index += 1
+        new_id = self.__cache_items_id
+        self.__cache_items_id += 1
 
         self.cache_controller.add_item(new_id, new_item)
         self.cache_controller.enter_item_edit_mode(new_id)
 
     def remove_cache_item(self):
-        selected_index, selected_item = self.cache_controller.selected_item()
+        selected_id, selected_item = self.cache_controller.selected_item()
 
-        if selected_index is None or selected_item is None:
+        if selected_id is None or selected_item is None:
             return
 
-        print('Cache item (', selected_index, selected_item.parent_id, selected_item.value, 'removed')
+        self.cache_controller.remove_item(selected_id)
 
     def edit_cache_item(self):
         selected_index, selected_item = self.cache_controller.selected_item()

@@ -24,6 +24,9 @@ class CachedTreeController(QObject):
         self.__cached_tree_view.clear()
 
     def add_item(self, item_id, item):
+        if item.parent_id in self.cached_data_base.dict:
+            item.exists = False
+
         self.cached_data_base.dict[item_id] = item
 
         self.__update_tree_view()
@@ -39,7 +42,8 @@ class CachedTreeController(QObject):
     def __add_tree_item(self, item_id, item):
         self.__cached_tree_view.add_item(item_id,
                                          item.parent_id,
-                                         item.value)
+                                         item.value,
+                                         item.exists)
 
     def sorted_data(self):
         new_dict = dict(self.cached_data_base.dict)
@@ -55,6 +59,21 @@ class CachedTreeController(QObject):
                     break
 
         return sorted_dict
+
+    def remove_item(self, item_id):
+        self.__remove_item(item_id)
+        self.__update_tree_view()
+
+    def __remove_item(self, item_id):
+        if item_id not in self.cached_data_base.dict:
+            return
+
+        item = self.cached_data_base.dict[item_id]
+        item.exists = False
+
+        for key, value in self.cached_data_base.dict.items():
+            if value.parent_id == item_id:
+                self.remove_item(key)
 
     def on_item_changed(self, item_id, value):
         if item_id in self.cached_data_base.dict:
