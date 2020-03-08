@@ -1,11 +1,13 @@
 from PyQt5.QtWidgets import QSizePolicy
-from PyQt5.QtCore import QObject
+from PyQt5.QtCore import QObject, pyqtSignal
 
 from ui.cached_tree_view import CachedTreeView
 from data_base import DataBase
 
 
 class CachedTreeController(QObject):
+    item_edited = pyqtSignal(int, str)
+
     def __init__(self, parent=None):
         super(CachedTreeController, self).__init__(parent)
 
@@ -23,14 +25,6 @@ class CachedTreeController(QObject):
         self.cached_data_base.dict.clear()
         self.__cached_tree_view.clear()
 
-    def add_item(self, item_id, item):
-        if item.parent_id in self.cached_data_base.dict:
-            item.exists = False
-
-        self.cached_data_base.dict[item_id] = item
-
-        self.__update_tree_view()
-
     def __update_tree_view(self):
         self.__cached_tree_view.clear()
 
@@ -44,6 +38,14 @@ class CachedTreeController(QObject):
                                          item.parent_id,
                                          item.value,
                                          item.exists)
+
+    def add_item(self, item_id, item):
+        if item.parent_id in self.cached_data_base.dict and not self.cached_data_base.dict[item.parent_id].exists:
+            item.exists = False
+
+        self.cached_data_base.dict[item_id] = item
+
+        self.__update_tree_view()
 
     def sorted_data(self):
         new_dict = dict(self.cached_data_base.dict)
@@ -65,19 +67,25 @@ class CachedTreeController(QObject):
         self.__update_tree_view()
 
     def __remove_item(self, item_id):
-        if item_id not in self.cached_data_base.dict:
+        item = self.cached_data_base.get_item_by_id(item_id)
+
+        if not item:
             return
 
-        item = self.cached_data_base.dict[item_id]
         item.exists = False
 
         for key, value in self.cached_data_base.dict.items():
             if value.parent_id == item_id:
                 self.remove_item(key)
 
+    def get_item(self, item_id):
+        return self.cached_data_base.get_item_by_id(item_id)
+
     def on_item_changed(self, item_id, value):
         if item_id in self.cached_data_base.dict:
             self.cached_data_base.dict[item_id].value = value
+
+            self.item_edited.emit(item_id, value)
 
     def selected_item(self):
         selected_id = self.__cached_tree_view.selected_item_id()
@@ -87,13 +95,7 @@ class CachedTreeController(QObject):
 
         selected_node_index = selected_id if selected_id in self.cached_data_base.dict else None
 
-        return selected_node_index, self.cached_data_base.get_node_by_index(selected_node_index)
-
-    def get_new_cache_index(self):
-        new_index = self.__cache_items_index
-        self.__cache_items_index += 1
-
-        return new_index
+        return selected_node_index, self.cached_data_base.get_item_by_id(selected_node_index)
 
     def enter_item_edit_mode(self, item_id):
         if item_id in self.cached_data_base.dict:
