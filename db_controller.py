@@ -5,9 +5,9 @@ from ui.db_tree_view import DBTreeView
 from test_trees.test_data_base import TestDataBase
 
 
-class DBTreeController(QObject):
+class DBController(QObject):
     def __init__(self, parent=None):
-        super(DBTreeController, self).__init__(parent)
+        super(DBController, self).__init__(parent)
 
         self.data_base = TestDataBase()
 

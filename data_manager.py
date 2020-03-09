@@ -1,4 +1,4 @@
-from db_node import DBNode
+from db_item import DBItem
 
 from enum import Enum
 
@@ -10,7 +10,7 @@ class ItemActionEnum(Enum):
 
 
 class ItemAction:
-    def __init__(self, item_id, item_action:ItemActionEnum):
+    def __init__(self, item_id, item_action: ItemActionEnum):
         self.item_id = item_id
         self.action = item_action
 
@@ -73,11 +73,11 @@ class DataManager:
 
             self.pre_cached_ids[selected_item.parent_id] = new_parent_id
 
-            new_item = DBNode(new_parent_id, selected_item.value)
+            new_item = DBItem(new_parent_id, selected_item.value)
 
             self.cache_controller.add_item(new_id, new_item)
         else:
-            new_item = DBNode(new_parent_id, selected_item.value)
+            new_item = DBItem(new_parent_id, selected_item.value)
 
             self.cache_controller.add_item(new_id, new_item)
 
@@ -87,7 +87,7 @@ class DataManager:
         if selected_id is None or selected_item is None:
             return
 
-        new_item = DBNode(selected_id)
+        new_item = DBItem(selected_id)
 
         new_id = self.__cache_items_id
         self.__cache_items_id += 1
@@ -148,7 +148,7 @@ class DataManager:
                 if not db_parent_id:
                     continue
 
-                new_item = DBNode(db_parent_id, item.value)
+                new_item = DBItem(db_parent_id, item.value)
 
                 new_item_id = self.db_controller.add_new_item(new_item)
 

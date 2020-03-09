@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QSizePolicy, QWidget, QPushButton, QVBoxLayout, QHBoxLayout
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 
-from cached_tree_controller import CachedTreeController
-from db_tree_controller import DBTreeController
+from cache_controller import CacheController
+from db_controller import DBController
 from data_manager import DataManager
 
 
@@ -23,13 +23,13 @@ class DBEditorWindow(QMainWindow):
         self.central_widget.setPalette(plt)
         self.central_widget.setAutoFillBackground(True)
 
-        db_tree_controller = DBTreeController()
+        db_tree_controller = DBController()
         db_tree_controller.reset()
 
-        cached_tree_controller = CachedTreeController()
-        cached_tree_controller.reset()
+        cache_tree_controller = CacheController()
+        cache_tree_controller.reset()
 
-        self.data_manager = DataManager(db_tree_controller, cached_tree_controller)
+        self.data_manager = DataManager(db_tree_controller, cache_tree_controller)
 
         self.load_to_cache_button = QPushButton(self)
         self.load_to_cache_button.setText('<<<')
@@ -75,7 +75,7 @@ class DBEditorWindow(QMainWindow):
         self.left_layout = QVBoxLayout()
         self.left_layout.setContentsMargins(0, 0, 0, 0)
         self.left_layout.setSpacing(6)
-        self.left_layout.addWidget(cached_tree_controller.tree_view())
+        self.left_layout.addWidget(cache_tree_controller.tree_view())
         self.left_layout.addLayout(self.bottom_buttons_layout)
 
         self.main_layout = QHBoxLayout()
@@ -100,9 +100,6 @@ class DBEditorWindow(QMainWindow):
     def load_to_cache_button_clicked(self):
         self.data_manager.load_data_to_cache()
 
-    def on_reset_button_clicked(self):
-        self.data_manager.reset()
-
     def on_add_item_to_cache_button_clicked(self):
         self.data_manager.add_new_item_to_cache()
 
@@ -114,3 +111,6 @@ class DBEditorWindow(QMainWindow):
 
     def on_apply_button_clicked(self):
         self.data_manager.apply_changes()
+
+    def on_reset_button_clicked(self):
+        self.data_manager.reset()

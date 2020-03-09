@@ -1,4 +1,4 @@
-class DBNode:
+class DBItem:
     def __init__(self, parent_id, value=''):
         self.parent_id = parent_id
         self.value = value
