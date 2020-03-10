@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QWidget, QTreeView, QHBoxLayout
-from PyQt5.QtGui import QStandardItemModel, QStandardItem
+from PyQt5.QtGui import QStandardItemModel
 from PyQt5.QtCore import Qt
 
 import ui.tree_view_item_roles as roles

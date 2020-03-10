@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import QMainWindow, QSizePolicy, QWidget, QPushButton, QVBo
 from PyQt5.QtGui import QColor
 from PyQt5.QtCore import Qt
 
-from cache_controller import CacheController
-from db_controller import DBController
-from data_manager import DataManager
+from core.cache_controller import CacheController
+from core.db_controller import DBController
+from core.data_manager import DataManager
 
 
 class DBEditorWindow(QMainWindow):

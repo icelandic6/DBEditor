@@ -1,5 +1,5 @@
-from db_item import DBItem
-from data_manager_actions import ItemActionEnum, ItemAction
+from core.db_item import DBItem
+from core.data_manager_actions import ItemActionEnum, ItemAction
 
 
 class DataManager:

@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QSizePolicy
 from PyQt5.QtCore import QObject, pyqtSignal
 
 from ui.cache_tree_view import CacheTreeView
-from data_base import DataBase
+from core.data_base import DataBase
 
 
 class CacheController(QObject):

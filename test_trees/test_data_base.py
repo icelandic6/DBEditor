@@ -1,5 +1,5 @@
-from data_base import DataBase
-from db_item import DBItem
+from core.data_base import DataBase
+from core.db_item import DBItem
 
 
 class TestDataBase(DataBase):
