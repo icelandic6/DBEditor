@@ -79,7 +79,10 @@ class DataManager:
         else:
             new_item = DBItem(new_parent_id, selected_item.value)
 
-            self.cache_controller.add_item(new_id, new_item)
+            added_item_exists = self.cache_controller.add_item(new_id, new_item)
+
+            if not added_item_exists:
+                self.cache_controller.remove_item(new_id)
 
     def add_new_item_to_cache(self):
         selected_id, selected_item = self.cache_controller.selected_item()

@@ -40,12 +40,17 @@ class CacheController(QObject):
                                         item.exists)
 
     def add_item(self, item_id, item):
+        added_item_exists = True
+
         if self.cache_data_base.has_item(item.parent_id) and not self.cache_data_base.get_item(item.parent_id).exists:
             item.exists = False
+            added_item_exists = False
 
         self.cache_data_base.add_item(item_id, item)
 
         self.__update_tree_view()
+
+        return added_item_exists
 
     def sorted_data(self):
         new_dict = self.cache_data_base.get_data()
