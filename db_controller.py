@@ -18,7 +18,7 @@ class DBController(QObject):
         return self.__db_tree_view
 
     def reset(self):
-        self.data_base.dict.clear()
+        self.data_base.clear()
         self.data_base.create_test_data_base()
 
         self.__update_tree_view()
@@ -26,7 +26,8 @@ class DBController(QObject):
     def __update_tree_view(self):
         self.__db_tree_view.clear()
 
-        for item_id, item in self.data_base.dict.items():
+        it = self.data_base.get_items()
+        for item_id, item in self.data_base.get_items():
             self.__add_tree_item(item_id, item)
 
         self.__db_tree_view.expand_all()
@@ -38,12 +39,12 @@ class DBController(QObject):
                                      item.exists)
 
     def add_new_item(self, item):
-        new_item_id = max(self.data_base.dict, key=int) + 1
+        new_item_id = self.data_base.get_new_id()
 
-        if item.parent_id in self.data_base.dict and not self.data_base.dict[item.parent_id].exists:
+        if self.data_base.has_item(item.parent_id) and not self.data_base.get_item(item.parent_id).exists:
             item.exists = False
 
-        self.data_base.dict[new_item_id] = item
+        self.data_base.add_item(new_item_id, item)
 
         self.__update_tree_view()
 
@@ -54,24 +55,19 @@ class DBController(QObject):
         self.__update_tree_view()
 
     def __remove_item(self, item_id):
-        item = self.data_base.get_item_by_id(item_id)
+        item = self.data_base.get_item(item_id)
 
         if not item:
             return
 
         item.exists = False
 
-        for key, value in self.data_base.dict.items():
+        for key, value in self.data_base.get_items():
             if value.parent_id == item_id:
                 self.remove_item(key)
 
     def edit_item(self, item_id, value):
-        item = self.data_base.dict.get(item_id, None)
-
-        if not item:
-            return
-
-        item.value = value
+        self.data_base.edit_item(item_id, value)
 
         self.__update_tree_view()
 
@@ -81,7 +77,7 @@ class DBController(QObject):
         if selected_id is None:
             return None, None
 
-        return selected_id, self.data_base.get_item_by_id(selected_id)
+        return selected_id, self.data_base.get_item(selected_id)
 
     def get_item_by_id(self, item_id):
-        return self.data_base.get_item_by_id(item_id)
+        return self.data_base.get_item(item_id)
