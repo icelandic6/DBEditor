@@ -9,7 +9,7 @@ class DBController(QObject):
     def __init__(self, parent=None):
         super(DBController, self).__init__(parent)
 
-        self.data_base = TestDataBase()
+        self.__data_base = TestDataBase()
 
         self.__db_tree_view = DBTreeView()
         self.__db_tree_view.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -18,16 +18,16 @@ class DBController(QObject):
         return self.__db_tree_view
 
     def reset(self):
-        self.data_base.clear()
-        self.data_base.create_test_data_base()
+        self.__data_base.clear()
+        self.__data_base.create_test_data_base()
 
         self.__update_tree_view()
 
     def __update_tree_view(self):
         self.__db_tree_view.clear()
 
-        it = self.data_base.get_items()
-        for item_id, item in self.data_base.get_items():
+        it = self.__data_base.get_items()
+        for item_id, item in self.__data_base.get_items():
             self.__add_tree_item(item_id, item)
 
         self.__db_tree_view.expand_all()
@@ -39,12 +39,12 @@ class DBController(QObject):
                                      item.exists)
 
     def add_new_item(self, item):
-        new_item_id = self.data_base.get_new_id()
+        new_item_id = self.__data_base.get_new_id()
 
-        if self.data_base.has_item(item.parent_id) and not self.data_base.get_item(item.parent_id).exists:
+        if self.__data_base.has_item(item.parent_id) and not self.__data_base.get_item(item.parent_id).exists:
             item.exists = False
 
-        self.data_base.add_item(new_item_id, item)
+        self.__data_base.add_item(new_item_id, item)
 
         self.__update_tree_view()
 
@@ -55,19 +55,19 @@ class DBController(QObject):
         self.__update_tree_view()
 
     def __remove_item(self, item_id):
-        item = self.data_base.get_item(item_id)
+        item = self.__data_base.get_item(item_id)
 
         if not item:
             return
 
         item.exists = False
 
-        for key, value in self.data_base.get_items():
+        for key, value in self.__data_base.get_items():
             if value.parent_id == item_id:
                 self.remove_item(key)
 
     def edit_item(self, item_id, value):
-        self.data_base.edit_item(item_id, value)
+        self.__data_base.edit_item(item_id, value)
 
         self.__update_tree_view()
 
@@ -77,7 +77,7 @@ class DBController(QObject):
         if selected_id is None:
             return None, None
 
-        return selected_id, self.data_base.get_item(selected_id)
+        return selected_id, self.__data_base.get_item(selected_id)
 
     def get_item_by_id(self, item_id):
-        return self.data_base.get_item(item_id)
+        return self.__data_base.get_item(item_id)
