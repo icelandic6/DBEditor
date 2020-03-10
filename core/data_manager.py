@@ -118,6 +118,10 @@ class DataManager:
         return None
 
     def apply_changes(self):
+        self.__apply_actions()
+        self.__check_cache_changes()
+
+    def __apply_actions(self):
         for action in self.__item_actions:
             if action.action == ItemActionEnum.action_item_add:
                 item = self.__new_cached_items.get(action.item_id)
@@ -132,9 +136,6 @@ class DataManager:
                         if v == item.parent_id:
                             db_parent_id = k
 
-                # if not db_parent_id and item.parent_id in self.__new_cached_items:
-                #     db_parent_id = self.__new_cached_items[item.parent_id]
-
                 if not db_parent_id:
                     continue
 
@@ -143,6 +144,7 @@ class DataManager:
                 new_item_id = self.__db_controller.add_new_item(new_item)
 
                 self.__cached_ids[new_item_id] = action.item_id
+
             elif action.action == ItemActionEnum.action_item_remove:
                 db_id = self.get_db_id(action.item_id)
 
@@ -154,9 +156,27 @@ class DataManager:
 
                 cached_item = self.__cache_controller.get_item(action.item_id)
 
-                if not cached_item or not db_id:
-                    continue
-
-                self.__db_controller.edit_item(db_id, cached_item.value)
+                if cached_item and db_id:
+                    self.__db_controller.edit_item(db_id, cached_item.value)
 
         self.__item_actions.clear()
+
+    def __check_cache_changes(self):
+        for db_item_id, cache_item_id in self.__cached_ids.items():
+            cache_item = self.__cache_controller.get_item(cache_item_id)
+
+            if not cache_item:
+                continue
+
+            cache_parent_id = None
+            for pre_db_id, pre_cache_id in self.__pre_cached_ids.items():
+                if pre_cache_id == cache_item.parent_id:
+                    cache_parent_id = pre_db_id
+                    break
+
+            if not cache_parent_id:
+                continue
+
+            db_item = self.__db_controller.get_item_by_id(cache_parent_id)
+            if db_item and not db_item.exists:
+                self.__cache_controller.remove_item(cache_item_id)
